@@ -1,0 +1,16 @@
+---
+# tasks file for scala
+- name: is scala installed?
+  command: /usr/bin/scala -version
+  register: scala
+  ignore_errors: true
+  failed_when: scala.rc not in (1,2)
+  changed_when: false
+
+- name: install scala for RedHat/CentOS
+  yum: name=http://downloads.typesafe.com/scala/{{scala_version}}/scala-{{scala_version}}.rpm state=present
+  when: scala is defined and scala.rc != 1 and ansible_distribution in ("CentOS", "RedHat", "Amazon")
+
+- name: install scala for Ubuntu/Debian
+  apt: name=http://downloads.typesafe.com/scala/{{scala_version}}/scala-{{scala_version}}.deb state=present
+  when: scala is defined and scala.rc != 1 and ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
